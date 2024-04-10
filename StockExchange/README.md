@@ -16,28 +16,6 @@ Welcome to the Stock Exchange module of our financial platform! This module enab
 
 Provide a brief introduction to the project, including its purpose and main features.
 
-## Directory Structure
-│
-├── models/           
-│   ├── Stock.js
-│   ├── StockPlan.js
-│   └── ...
-│
-├── routes/  
-│   ├── StockRoutes.js
-│   ├── StockPlanRoutes.js
-│   └── ...
-│
-├── middlewares/  
-│   ├── validation.js
-│   ├── userAuth.js 
-│   └── ...
-│
-└── paymentIntegration/  
-    ├── PayPal.js
-    ├── ...
-    └── ...
-
 
 ## Installation
 

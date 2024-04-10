@@ -26,29 +26,6 @@ The Financial Platform is designed to facilitate investment management across mu
   - Integrate with payment gateways such as PayPal for fiat currency transactions.
   - Support cryptocurrency transactions for real estate investments.
 
-## Directory Structure
-│
-├── FinacialPlatform/           
-│   ├── RealEstateManagement/
-│   ├── StockExchange/
-│   └── ...
-│
-├── Routes/  
-│   ├── RealEstateManagement/routes/
-│   ├── StockExchange/routes/
-│   └── ...
-│
-├── Middlewares/  
-│   ├── RealEstateManagement/middlewares/
-│   ├── StockExchange/middlewares/
-│   └── ...
-│
-└── Payment Integration/  
-    ├── RealEstateManagement/paymentIntegration/
-    ├── StockExchange/paymentIntegration/
-    └── ...
-
-
 ## Functionality
 
 The Financial Platform provides a range of functionality across its modules:

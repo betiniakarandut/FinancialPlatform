@@ -5,7 +5,6 @@ Welcome to the Real Estate Management module of our financial platform! This mod
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Documentation](#api-documentation)
@@ -15,35 +14,6 @@ Welcome to the Real Estate Management module of our financial platform! This mod
 ## Introduction
 
 Provide a brief introduction to the project, including its purpose and main features.
-
-## Features
-
-real-estate-management/
-│
-├── controllers/ 
-│   ├── investmentPlanController.js
-│   ├── investmentController.js
-│   └── ...
-│
-├── models/           
-│   ├── Investment.js
-│   ├── InvestmentPlan.js
-│   └── ...
-│
-├── routes/  
-│   ├── investmentRoutes.js
-│   ├── investmentPlanRoutes.js
-│   └── ...
-│
-├── middlewares/  
-│   ├── validation.js
-│   ├── userAuth.js 
-│   └── ...
-│
-└── paymentIntegration/  
-    ├── cryptoWallet.js
-    ├── ...
-    └── ...
 
 ## Installation
 
