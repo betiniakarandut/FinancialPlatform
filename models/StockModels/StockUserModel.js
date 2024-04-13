@@ -38,6 +38,6 @@ const StockUserSchema = new mongoose.Schema({
     }
 })
 
-const StockUser = mongoose.model('StockUser', StockUserSchema)
+const StockUser = mongoose.model('STOCK_User', StockUserSchema)
 
 export default StockUser;
