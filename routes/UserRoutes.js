@@ -15,7 +15,7 @@ userRoutes.post('/signup', signUp);
 userRoutes.post('/signin', signIn);
 userRoutes.post('/sendotpverificationsms', sendOTPVerificationEmailAndSMS);
 userRoutes.post('/verifyotp', verifyOTP);
-userRoutes.get('/verify/', verify);
+userRoutes.get('/verify/:userId/:uniquestring', verify);
 userRoutes.post('/githubsignup', githubSignUp);
 userRoutes.post('/facebooksignup', facebookSignUp);
 
