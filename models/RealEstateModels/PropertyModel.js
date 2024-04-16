@@ -7,6 +7,7 @@ const propertyModelSchema = new mongoose.Schema({
     amount: Number,
     address: String,
     picture: String,
+    description: String,
     createdAt: {type: Date, default: Date.now()},
 });
 
