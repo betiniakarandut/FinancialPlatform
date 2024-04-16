@@ -1,9 +1,23 @@
+import fs from "fs";
+import { promisify } from "util";
 import Property from "../../models/RealEstateModels/PropertyModel";
+import dotenv from "dotenv";
+import {v2 as cloudinary} from 'cloudinary';
+
+dotenv.config()
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUD_NAME, 
+  api_key: process.env.API_KEY, 
+  api_secret: process.env.API_SECRET,
+});
 
 export const uploadProperty = async (req, res) => {
     try {
         const userId = req.user._id;
         const { name, description, address, label, amount } = req.body;
+        const file = req.files.file;
+
         if (!name || !address || !label || !amount) {
             return res.status(400).json({
                 status: "Failed",
@@ -17,14 +31,26 @@ export const uploadProperty = async (req, res) => {
             });
         }
 
+        if (!file) {
+            return res.status(400).json({
+                status: "Failed",
+                message: "Bad request: No file"
+            });
+        }
+
+        const readFileAsync = promisify(fs.readFile);
+        const fileData = await readFileAsync(file.tempFilePath);
+        const result = await cloudinary.uploader.upload(fileData, { resource_type: "auto" });
+        console.log(result);
+
         const property = new Property({
             name: name,
             label: label,
             amount: amount,
             address: address,
             description: description,
+            picture: result.secure_url,
             owner: userId,
-            picture: picture,
             createdAt: Date.now(),
         });
         
@@ -36,7 +62,7 @@ export const uploadProperty = async (req, res) => {
             property: savedProperty,
         });
     } catch (error) {
-        console,log(error);
+        console.log(error);
         return res.status(500).json({
             status: "Failed",
             message: "Internal server error"
@@ -45,7 +71,7 @@ export const uploadProperty = async (req, res) => {
 
 }
 
-export const updateProperty = async (req, res) {
+export const updateProperty = async (req, res) => {
     try {
         const userId = req.user._id;
         const { propertyId } = req.params.propertyId;
@@ -67,10 +93,58 @@ export const updateProperty = async (req, res) {
         }
 
         if (name) existingProperty.name = name;
-        if (description) existingProperty.description = description,
+        if (description) existingProperty.description = description;
         if (address) existingProperty.address = address;
         if (label) existingProperty.label = label;
-        if (amount) existingProperty.amount = amount
+        if (amount) existingProperty.amount = amount;
+        if (picture) existingProperty.picture = picture;
+
+        const savedExistingProperty = await existingProperty.save();
+
+        return res.status(200).json({
+            status: "Success",
+            message: "Your property was successfully updated",
+            name: savedExistingProperty.name,
+            description: savedExistingProperty.description,
+            amount: savedExistingProperty.amount,
+            updatedAt: Date.now(),
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            status: "Failed",
+            message: `Internal server error ${error}`
+        });
+    }
+}
+
+export const deleteProperty = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const propertyId = req.params.propertyId;
+        
+        if(!userId) {
+            return res.status(403).json({
+                status: "Failed",
+                message: "Unauthorized"
+            });
+        }
+
+        existingProperty = await Property.findById({_id: userId});
+        if (!existingProperty) {
+            return res.status(404).json({
+                status: "Failed",
+                message: "Not Found: Property does not exist"
+            });
+        }
+
+        await Property.findByIdAndDelete(propertyId);
+
+        return res.status(200).json({
+            status: "Success",
+            message: "Property deleted successfully",
+        });
+        
     } catch (error) {
         console.log(error);
         return res.status(500).json({
