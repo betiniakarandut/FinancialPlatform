@@ -88,10 +88,12 @@ export const signUp = async (req, res) => {
             });
         }
 
-            const userExist = await User.findOne({ email });
-            if (userExist) {
-                return res.status(400).json({ message: "User already exists" });
-            }
+        const userExist = await User.findOne({ email });
+        if (userExist) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+        if (process.env.AUTH_ADMIN_EMAIL.includes(email)) {
 
             const hashed_password = await bcrypt.hash(password, 10);
 
@@ -101,16 +103,38 @@ export const signUp = async (req, res) => {
                 username,
                 phone,
                 verified: false,
+                roles: "Admin",
             });
 
             const savedUser = await newUser.save();
-            
+
             await sendOTPVerificationEmailAndSMS(savedUser, res);
 
-            return res.status(200).json({
+            res.status(200).json({
                 message: "New user created successfully",
                 userDetails: savedUser
             });
+        }
+
+        const hashed_password = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
+            email,
+            password: hashed_password,
+            username,
+            phone,
+            roles: 'Normal user',
+            verified: false,
+        });
+
+        const savedUser = await newUser.save();
+        
+        await sendOTPVerificationEmailAndSMS(savedUser, res);
+
+        return res.status(200).json({
+            message: "New user created successfully",
+            userDetails: savedUser
+        });
 
     } catch (err) {
         console.error("Error during signup:", err);
@@ -332,5 +356,40 @@ export const verifyOTP = async (req, res) => {
             message: "Internal server error!"
         })
         
+    }
+}
+
+export const deleteUser = async (req, res) => {
+    try {
+
+        const userId = req.params.userId;
+
+        const existingUser = await User.findById(userId);
+        if (!userId || !existingUser) {
+            return res.status(404).json({
+                status: "Failed",
+                message: "This user does not exist"
+            });
+        }
+        if (userId !== existingUser._id.toString()) {
+            return res.status(403).json({
+                status: "Failed",
+                message: "Unauthorized"
+            });
+        }
+
+        await User.findByIdAndDelete(userId);
+
+        return res.status(200).json({
+            status: "Success",
+            message: "User deleted successfully"
+        });
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            status: "Failed",
+            message: `Internal server error ${error}`
+        });
     }
 }
