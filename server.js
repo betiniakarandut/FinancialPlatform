@@ -3,6 +3,8 @@ import cors from "cors";
 import mongoose from "mongoose";
 import { dbConnStr } from "./utils/configuration.js";
 import userRoutes from "./routes/UserRoutes.js";
+import propertyRoute from "./routes/RealEstateRoute/PropertyRoute.js";
+import paginationRoute from "./routes/RealEstateRoute/PropertyPaginationRoute.js";
 
 
 const app = express();
@@ -22,6 +24,8 @@ app.get('/', (req, res) => {
 })
 
 app.use('/user', userRoutes);
+app.use('/property', propertyRoute);
+app.use('/pagination', paginationRoute);
 
 mongoose.connect(dbConnStr, { useNewUrlParser: true })
 .then( () => {
