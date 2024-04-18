@@ -1,6 +1,6 @@
 import fs from "fs";
 import { promisify } from "util";
-import Property from "../../models/RealEstateModels/PropertyModel";
+import Property from "../../models/RealEstateModels/PropertyModel.js";
 import dotenv from "dotenv";
 import {v2 as cloudinary} from 'cloudinary';
 
@@ -15,8 +15,8 @@ cloudinary.config({
 export const uploadProperty = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { name, description, address, label, amount } = req.body;
-        const file = req.files.file;
+        const { name, description, label, address, amount } = req.body;
+        const file = req.file;
 
         if (!name || !address || !label || !amount) {
             return res.status(400).json({
@@ -37,17 +37,16 @@ export const uploadProperty = async (req, res) => {
                 message: "Bad request: No file"
             });
         }
+        console.log('this is file: ', file)
 
-        const readFileAsync = promisify(fs.readFile);
-        const fileData = await readFileAsync(file.tempFilePath);
-        const result = await cloudinary.uploader.upload(fileData, { resource_type: "auto" });
+        const result = await cloudinary.uploader.upload(req.file.path, { resource_type: "auto" });
         console.log(result);
 
         const property = new Property({
             name: name,
-            label: label,
             amount: amount,
             address: address,
+            label: label,
             description: description,
             picture: result.secure_url,
             owner: userId,
@@ -74,9 +73,12 @@ export const uploadProperty = async (req, res) => {
 export const updateProperty = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { propertyId } = req.params.propertyId;
-        const { name, label, amount, description, address, picture} = req.body;
+        const propertyId = req.params.propertyId;
 
+        console.log('this is req.body: ', req.body); 
+
+        console.log('this is userId: ', userId);
+        console.log('this is propertyId: ', propertyId);
         if (!userId || !propertyId) {
             return res.status(404).json({
                 status: "Failed",
@@ -84,30 +86,38 @@ export const updateProperty = async (req, res) => {
             });
         }
         
-        const existingProperty = await Property.findById({_id: propertyId, owner: userId});
+        const existingProperty = await Property.findOneAndUpdate(
+            { _id: propertyId, owner: userId },
+            {
+                $set: {
+                    name: req.body.name,
+                    description: req.body.description,
+                    amount: req.body.amount,
+                    label: req.body.label,
+                    address: req.body.address,
+                    picture: req.body.picture
+                }
+            },
+            { new: true }
+        );
+
+        console.log("This is existing Property: ", existingProperty)
         if(!existingProperty) {
             return res.status(404).json({
                 status: "Failed",
                 message: "Not found: Property does not exist"
             });
         }
+        
+        const savedUpdatedProperty = await existingProperty.save();
+        console.log('updated property ', savedUpdatedProperty)
 
-        if (name) existingProperty.name = name;
-        if (description) existingProperty.description = description;
-        if (address) existingProperty.address = address;
-        if (label) existingProperty.label = label;
-        if (amount) existingProperty.amount = amount;
-        if (picture) existingProperty.picture = picture;
-
-        const savedExistingProperty = await existingProperty.save();
+        
 
         return res.status(200).json({
             status: "Success",
             message: "Your property was successfully updated",
-            name: savedExistingProperty.name,
-            description: savedExistingProperty.description,
-            amount: savedExistingProperty.amount,
-            updatedAt: Date.now(),
+            updatedProperty: savedUpdatedProperty
         });
     } catch (error) {
         console.log(error);
@@ -130,7 +140,7 @@ export const deleteProperty = async (req, res) => {
             });
         }
 
-        existingProperty = await Property.findById({_id: userId});
+        const existingProperty = await Property.findById({_id: propertyId, owner: userId});
         if (!existingProperty) {
             return res.status(404).json({
                 status: "Failed",
