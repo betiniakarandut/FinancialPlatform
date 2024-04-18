@@ -22,12 +22,7 @@ const userSchema = new mongoose.Schema({
     },
     roles: {
         type: String,
-        enum: ['investor', 'admin'],
-        default: 'Normal User',
-    },
-    permissions: {
-        type: Array,
-        default: [],
+        enum: ['Normal user', 'Admin']
     },
     phone: {
         type: String,
