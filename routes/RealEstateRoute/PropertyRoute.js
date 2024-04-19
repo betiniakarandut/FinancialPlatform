@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-propertyRoute.post('/uploads', upload.single('file'), middlewareAuth, uploadProperty);
+propertyRoute.post('/uploads', upload.fields([{name: 'file1', maxCount: 1}, {name: 'file2', maxCount: 1}]), middlewareAuth, uploadProperty);
 propertyRoute.put('/:propertyId/update', middlewareAuth, updateProperty);
 propertyRoute.delete('/:propertyId/delete', middlewareAuth, deleteProperty);
 propertyRoute.get('/search', searchProperty);
