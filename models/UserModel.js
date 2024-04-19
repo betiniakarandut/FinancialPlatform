@@ -22,15 +22,17 @@ const userSchema = new mongoose.Schema({
     },
     roles: {
         type: String,
-        enum: ['Normal user', 'Admin']
+        enum: ['Normal user', 'Admin'],
+        default: 'Normal user',
     },
     phone: {
         type: String,
     },
     cryptoWalletAddress: {
         type: String,
-        unique: true,
-    }
+        default:'uytond'
+    },
+    profileImage: String,
 })
 
 const User = mongoose.model('RE_User', userSchema)
