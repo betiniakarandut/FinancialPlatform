@@ -15,10 +15,25 @@ cloudinary.config({
 export const uploadProperty = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { name, description, label, address, amount } = req.body;
-        const file = req.file;
+        const {
+            description, 
+            label, 
+            location, 
+            asking_price,
+            bedrooms,
+            bathrooms,
+            garage,
+            area, 
+        } = req.body;
 
-        if (!name || !address || !label || !amount) {
+        const file1 = req.files['file1'][0];
+        const file2 = req.files['file2'][0];
+
+        if (
+            !description || !location || 
+            !label || !area || !garage ||
+            !bedrooms || !bathrooms || !asking_price
+        ) {
             return res.status(400).json({
                 status: "Failed",
                 message: "Incomplete fields"
@@ -31,33 +46,50 @@ export const uploadProperty = async (req, res) => {
             });
         }
 
-        if (!file) {
+        if (!file1 || !file2) {
             return res.status(400).json({
                 status: "Failed",
                 message: "Bad request: No file"
             });
         }
-        console.log('this is file: ', file)
+        console.log('this is file1: ', file1);
+        console.log('this is file2: ', file2);
 
-        const result = await cloudinary.uploader.upload(req.file.path, { resource_type: "auto" });
-        console.log(result);
+        const result1 = await cloudinary.uploader.upload(file1.path, { resource_type: "auto" });
+        const result2 = await cloudinary.uploader.upload(file2.path, { resource_type: "auto" });
+        console.log(result1);
+        console.log(result2);
+        console.log(`this is asking price: ${asking_price}`)
 
         const property = new Property({
-            name: name,
-            amount: amount,
-            address: address,
-            label: label,
             description: description,
-            picture: result.secure_url,
+            asking_price: asking_price,
+            location: location,
+            label: label,
+            area: area,
+            bathrooms: bathrooms,
+            garage: garage,
+            bedrooms: bedrooms,
+            picture: result1.secure_url,
+            propertyDocument: result2.secure_url,
             owner: userId,
             createdAt: Date.now(),
         });
+
+        console.log(`this is asking price: ${property.asking_price}`)
         
         const savedProperty = await property.save();
-        
+        console.log(`this is asking price: ${savedProperty.asking_price}`)
+
         return res.status(200).json({
             status: "Success",
             message: "Property successfully registered",
+            personal_info: {
+                fullName: req.user.name,
+                email: req.user.email,
+                phone: req.user.phone,
+                ownershipDocument: result2.secure_url,
+            },
             property: savedProperty,
         });
     } catch (error) {
