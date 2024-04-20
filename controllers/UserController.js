@@ -103,7 +103,7 @@ export const signUp = async (req, res) => {
                 username,
                 phone,
                 verified: false,
-                roles: "Admin",
+                Admin: true,
             });
 
             const savedUser = await newUser.save();
@@ -123,7 +123,7 @@ export const signUp = async (req, res) => {
             password: hashed_password,
             username,
             phone,
-            roles: 'Normal user',
+            Admin: false,
             verified: false,
         });
 
